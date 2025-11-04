@@ -19,7 +19,7 @@ const getAllLessons = async (req, res) => {
   }
 };
 
-// Change: getitemById → getLessonById
+// Change: getlessonById → getLessonById
 const getLessonById = async (req, res) => {
   try {
     const lesson = await Lesson.findById(req.params.id);
@@ -40,26 +40,26 @@ const getLessonById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid lesson ID format",
       });
     }
 
     res.status(500).json({
       success: false,
-      error: "Failed to fetch item",
+      error: "Failed to fetch lesson",
     });
   }
 };
 
-// Change: createitem → createLesson
+// Change: createlesson → createLesson
 const createLesson = async (req, res) => {
   try {
-    const newitem = new Lesson(req.body);
-    const saveditem = await newitem.save();
+    const newlesson = new Lesson(req.body);
+    const savedlesson = await newlesson.save();
 
     res.status(201).json({
       success: true,
-      data: saveditem,
+      data: savedlesson,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -76,12 +76,12 @@ const createLesson = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to create item",
+      error: "Failed to create lesson",
     });
   }
 };
 
-// Change: updateitem → updateLesson
+// Change: updatelesson → updateLesson
 const updateLesson = async (req, res) => {
   try {
     const lesson = await Lesson.findByIdAndUpdate(req.params.id, req.body, {
@@ -93,7 +93,7 @@ const updateLesson = async (req, res) => {
       // Changed from !Lesson to !lesson
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "lesson not found",
       });
     }
 
@@ -105,7 +105,7 @@ const updateLesson = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid lesson ID format",
       });
     }
     if (error.name === "ValidationError") {
@@ -117,12 +117,12 @@ const updateLesson = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to update item",
+      error: "Failed to update lesson",
     });
   }
 };
 
-// Change: deleteitem → deleteLesson
+// Change: deletelesson → deleteLesson
 const deleteLesson = async (req, res) => {
   try {
     const lesson = await Lesson.findByIdAndDelete(req.params.id);
@@ -130,24 +130,24 @@ const deleteLesson = async (req, res) => {
     if (!lesson) {
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "lesson not found",
       });
     }
 
     res.json({
       success: true,
-      message: "item deleted successfully",
+      message: "lesson deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid lesson ID format",
       });
     }
     res.status(500).json({
       success: false,
-      error: "Failed to delete item",
+      error: "Failed to delete lesson",
     });
   }
 };

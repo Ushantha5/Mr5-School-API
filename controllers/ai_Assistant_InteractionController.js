@@ -19,7 +19,7 @@ const getAllAi_Assistant_Interctions = async (req, res) => {
   }
 };
 
-// Change: getitemById → getAi_Assistant_InterctionById
+// Change: getai_Assistant_InteractionById → getAi_Assistant_InterctionById
 const getAi_Assistant_InterctionById = async (req, res) => {
   try {
     const ai_Assisstant_Interction = await Ai_Assistant_Interction.findById(
@@ -42,26 +42,27 @@ const getAi_Assistant_InterctionById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid ai_Assistant_Interaction ID format",
       });
     }
 
     res.status(500).json({
       success: false,
-      error: "Failed to fetch item",
+      error: "Failed to fetch ai_Assistant_Interaction",
     });
   }
 };
 
-// Change: createitem → createAi_Assistant_Interction
+// Change: createai_Assistant_Interaction → createAi_Assistant_Interction
 const createAi_Assistant_Interction = async (req, res) => {
   try {
-    const newitem = new Ai_Assistant_Interction(req.body);
-    const saveditem = await newitem.save();
+    const newai_Assistant_Interaction = new Ai_Assistant_Interction(req.body);
+    const savedai_Assistant_Interaction =
+      await newai_Assistant_Interaction.save();
 
     res.status(201).json({
       success: true,
-      data: saveditem,
+      data: savedai_Assistant_Interaction,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -78,12 +79,12 @@ const createAi_Assistant_Interction = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to create item",
+      error: "Failed to create ai_Assistant_Interaction",
     });
   }
 };
 
-// Change: updateitem → updateAi_Assistant_Interction
+// Change: updateai_Assistant_Interaction → updateAi_Assistant_Interction
 const updateAi_Assistant_Interction = async (req, res) => {
   try {
     const ai_Assisstant_Interction =
@@ -96,7 +97,7 @@ const updateAi_Assistant_Interction = async (req, res) => {
       // Changed from !Ai_Assistant_Interction to !ai_Assisstant_Interction
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "ai_Assistant_Interaction not found",
       });
     }
 
@@ -108,7 +109,7 @@ const updateAi_Assistant_Interction = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid ai_Assistant_Interaction ID format",
       });
     }
     if (error.name === "ValidationError") {
@@ -120,12 +121,12 @@ const updateAi_Assistant_Interction = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to update item",
+      error: "Failed to update ai_Assistant_Interaction",
     });
   }
 };
 
-// Change: deleteitem → deleteAi_Assistant_Interction
+// Change: deleteai_Assistant_Interaction → deleteAi_Assistant_Interction
 const deleteAi_Assistant_Interction = async (req, res) => {
   try {
     const ai_Assisstant_Interction =
@@ -134,24 +135,24 @@ const deleteAi_Assistant_Interction = async (req, res) => {
     if (!ai_Assisstant_Interction) {
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "ai_Assistant_Interaction not found",
       });
     }
 
     res.json({
       success: true,
-      message: "item deleted successfully",
+      message: "ai_Assistant_Interaction deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid ai_Assistant_Interaction ID format",
       });
     }
     res.status(500).json({
       success: false,
-      error: "Failed to delete item",
+      error: "Failed to delete ai_Assistant_Interaction",
     });
   }
 };

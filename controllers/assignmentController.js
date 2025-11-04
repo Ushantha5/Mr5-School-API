@@ -19,7 +19,7 @@ const getAllAssignments = async (req, res) => {
   }
 };
 
-// Change: getitemById → getAssignmentById
+// Change: getassignmentById → getAssignmentById
 const getAssignmentById = async (req, res) => {
   try {
     const assignment = await Assignment.findById(req.params.id);
@@ -40,26 +40,26 @@ const getAssignmentById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid assignment ID format",
       });
     }
 
     res.status(500).json({
       success: false,
-      error: "Failed to fetch item",
+      error: "Failed to fetch assignment",
     });
   }
 };
 
-// Change: createitem → createAssignment
+// Change: createassignment → createAssignment
 const createAssignment = async (req, res) => {
   try {
-    const newitem = new Assignment(req.body);
-    const saveditem = await newitem.save();
+    const newassignment = new Assignment(req.body);
+    const savedassignment = await newassignment.save();
 
     res.status(201).json({
       success: true,
-      data: saveditem,
+      data: savedassignment,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -76,12 +76,12 @@ const createAssignment = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to create item",
+      error: "Failed to create assignment",
     });
   }
 };
 
-// Change: updateitem → updateAssignment
+// Change: updateassignment → updateAssignment
 const updateAssignment = async (req, res) => {
   try {
     const assignment = await Assignment.findByIdAndUpdate(
@@ -97,7 +97,7 @@ const updateAssignment = async (req, res) => {
       // Changed from !Assignment to !assignment
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "assignment not found",
       });
     }
 
@@ -109,7 +109,7 @@ const updateAssignment = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid assignment ID format",
       });
     }
     if (error.name === "ValidationError") {
@@ -121,12 +121,12 @@ const updateAssignment = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to update item",
+      error: "Failed to update assignment",
     });
   }
 };
 
-// Change: deleteitem → deleteAssignment
+// Change: deleteassignment → deleteAssignment
 const deleteAssignment = async (req, res) => {
   try {
     const assignment = await Assignment.findByIdAndDelete(req.params.id);
@@ -134,24 +134,24 @@ const deleteAssignment = async (req, res) => {
     if (!assignment) {
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "assignment not found",
       });
     }
 
     res.json({
       success: true,
-      message: "item deleted successfully",
+      message: "assignment deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid assignment ID format",
       });
     }
     res.status(500).json({
       success: false,
-      error: "Failed to delete item",
+      error: "Failed to delete assignment",
     });
   }
 };

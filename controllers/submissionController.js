@@ -19,7 +19,7 @@ const getAllSubmissions = async (req, res) => {
   }
 };
 
-// Change: getitemById → getSubmissionById
+// Change: getsubmissionById → getSubmissionById
 const getSubmissionById = async (req, res) => {
   try {
     const submission = await Submission.findById(req.params.id);
@@ -40,26 +40,26 @@ const getSubmissionById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid submission ID format",
       });
     }
 
     res.status(500).json({
       success: false,
-      error: "Failed to fetch item",
+      error: "Failed to fetch submission",
     });
   }
 };
 
-// Change: createitem → createSubmission
+// Change: createsubmission → createSubmission
 const createSubmission = async (req, res) => {
   try {
-    const newitem = new Submission(req.body);
-    const saveditem = await newitem.save();
+    const newsubmission = new Submission(req.body);
+    const savedsubmission = await newsubmission.save();
 
     res.status(201).json({
       success: true,
-      data: saveditem,
+      data: savedsubmission,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -76,12 +76,12 @@ const createSubmission = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to create item",
+      error: "Failed to create submission",
     });
   }
 };
 
-// Change: updateitem → updateSubmission
+// Change: updatesubmission → updateSubmission
 const updateSubmission = async (req, res) => {
   try {
     const submission = await Submission.findByIdAndUpdate(
@@ -97,7 +97,7 @@ const updateSubmission = async (req, res) => {
       // Changed from !Submission to !submission
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "submission not found",
       });
     }
 
@@ -109,7 +109,7 @@ const updateSubmission = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid submission ID format",
       });
     }
     if (error.name === "ValidationError") {
@@ -121,12 +121,12 @@ const updateSubmission = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to update item",
+      error: "Failed to update submission",
     });
   }
 };
 
-// Change: deleteitem → deleteSubmission
+// Change: deletesubmission → deleteSubmission
 const deleteSubmission = async (req, res) => {
   try {
     const submission = await Submission.findByIdAndDelete(req.params.id);
@@ -134,24 +134,24 @@ const deleteSubmission = async (req, res) => {
     if (!submission) {
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "submission not found",
       });
     }
 
     res.json({
       success: true,
-      message: "item deleted successfully",
+      message: "submission deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid submission ID format",
       });
     }
     res.status(500).json({
       success: false,
-      error: "Failed to delete item",
+      error: "Failed to delete submission",
     });
   }
 };

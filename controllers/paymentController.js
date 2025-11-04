@@ -19,7 +19,7 @@ const getAllPayments = async (req, res) => {
   }
 };
 
-// Change: getitemById → getPaymentById
+// Change: getpaymentById → getPaymentById
 const getPaymentById = async (req, res) => {
   try {
     const payment = await Payment.findById(req.params.id);
@@ -40,26 +40,26 @@ const getPaymentById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid payment ID format",
       });
     }
 
     res.status(500).json({
       success: false,
-      error: "Failed to fetch item",
+      error: "Failed to fetch payment",
     });
   }
 };
 
-// Change: createitem → createPayment
+// Change: createpayment → createPayment
 const createPayment = async (req, res) => {
   try {
-    const newitem = new Payment(req.body);
-    const saveditem = await newitem.save();
+    const newpayment = new Payment(req.body);
+    const savedpayment = await newpayment.save();
 
     res.status(201).json({
       success: true,
-      data: saveditem,
+      data: savedpayment,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -76,12 +76,12 @@ const createPayment = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to create item",
+      error: "Failed to create payment",
     });
   }
 };
 
-// Change: updateitem → updatePayment
+// Change: updatepayment → updatePayment
 const updatePayment = async (req, res) => {
   try {
     const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
@@ -93,7 +93,7 @@ const updatePayment = async (req, res) => {
       // Changed from !Payment to !payment
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "payment not found",
       });
     }
 
@@ -105,7 +105,7 @@ const updatePayment = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid payment ID format",
       });
     }
     if (error.name === "ValidationError") {
@@ -117,12 +117,12 @@ const updatePayment = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to update item",
+      error: "Failed to update payment",
     });
   }
 };
 
-// Change: deleteitem → deletePayment
+// Change: deletepayment → deletePayment
 const deletePayment = async (req, res) => {
   try {
     const payment = await Payment.findByIdAndDelete(req.params.id);
@@ -130,24 +130,24 @@ const deletePayment = async (req, res) => {
     if (!payment) {
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "payment not found",
       });
     }
 
     res.json({
       success: true,
-      message: "item deleted successfully",
+      message: "payment deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid payment ID format",
       });
     }
     res.status(500).json({
       success: false,
-      error: "Failed to delete item",
+      error: "Failed to delete payment",
     });
   }
 };

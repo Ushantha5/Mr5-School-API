@@ -19,7 +19,7 @@ const getAllEnrollments = async (req, res) => {
   }
 };
 
-// Change: getitemById → getEnrollmentById
+// Change: getenrollmentById → getEnrollmentById
 const getEnrollmentById = async (req, res) => {
   try {
     const enrollment = await Enrollment.findById(req.params.id);
@@ -40,26 +40,26 @@ const getEnrollmentById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid enrollment ID format",
       });
     }
 
     res.status(500).json({
       success: false,
-      error: "Failed to fetch item",
+      error: "Failed to fetch enrollment",
     });
   }
 };
 
-// Change: createitem → createEnrollment
+// Change: createenrollment → createEnrollment
 const createEnrollment = async (req, res) => {
   try {
-    const newitem = new Enrollment(req.body);
-    const saveditem = await newitem.save();
+    const newenrollment = new Enrollment(req.body);
+    const savedenrollment = await newenrollment.save();
 
     res.status(201).json({
       success: true,
-      data: saveditem,
+      data: savedenrollment,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -76,12 +76,12 @@ const createEnrollment = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to create item",
+      error: "Failed to create enrollment",
     });
   }
 };
 
-// Change: updateitem → updateEnrollment
+// Change: updateenrollment → updateEnrollment
 const updateEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndUpdate(
@@ -97,7 +97,7 @@ const updateEnrollment = async (req, res) => {
       // Changed from !Enrollment to !enrollment
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "enrollment not found",
       });
     }
 
@@ -109,7 +109,7 @@ const updateEnrollment = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid enrollment ID format",
       });
     }
     if (error.name === "ValidationError") {
@@ -121,12 +121,12 @@ const updateEnrollment = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to update item",
+      error: "Failed to update enrollment",
     });
   }
 };
 
-// Change: deleteitem → deleteEnrollment
+// Change: deleteenrollment → deleteEnrollment
 const deleteEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
@@ -134,24 +134,24 @@ const deleteEnrollment = async (req, res) => {
     if (!enrollment) {
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "enrollment not found",
       });
     }
 
     res.json({
       success: true,
-      message: "item deleted successfully",
+      message: "enrollment deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid enrollment ID format",
       });
     }
     res.status(500).json({
       success: false,
-      error: "Failed to delete item",
+      error: "Failed to delete enrollment",
     });
   }
 };

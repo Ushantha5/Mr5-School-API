@@ -19,7 +19,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// Change: getitemById → getUserById
+// Change: getuserById → getUserById
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -40,26 +40,26 @@ const getUserById = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid user ID format",
       });
     }
 
     res.status(500).json({
       success: false,
-      error: "Failed to fetch item",
+      error: "Failed to fetch user",
     });
   }
 };
 
-// Change: createitem → createUser
+// Change: createuser → createUser
 const createUser = async (req, res) => {
   try {
-    const newitem = new User(req.body);
-    const saveditem = await newitem.save();
+    const newuser = new User(req.body);
+    const saveduser = await newuser.save();
 
     res.status(201).json({
       success: true,
-      data: saveditem,
+      data: saveduser,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -76,12 +76,12 @@ const createUser = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to create item",
+      error: "Failed to create user",
     });
   }
 };
 
-// Change: updateitem → updateUser
+// Change: updateuser → updateUser
 const updateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -93,7 +93,7 @@ const updateUser = async (req, res) => {
       // Changed from !User to !user
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "user not found",
       });
     }
 
@@ -105,7 +105,7 @@ const updateUser = async (req, res) => {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid user ID format",
       });
     }
     if (error.name === "ValidationError") {
@@ -117,12 +117,12 @@ const updateUser = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      error: "Failed to update item",
+      error: "Failed to update user",
     });
   }
 };
 
-// Change: deleteitem → deleteUser
+// Change: deleteuser → deleteUser
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -130,24 +130,24 @@ const deleteUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: "item not found",
+        error: "user not found",
       });
     }
 
     res.json({
       success: true,
-      message: "item deleted successfully",
+      message: "user deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        error: "Invalid item ID format",
+        error: "Invalid user ID format",
       });
     }
     res.status(500).json({
       success: false,
-      error: "Failed to delete item",
+      error: "Failed to delete user",
     });
   }
 };
