@@ -5,7 +5,7 @@ import {
   createLesson,
   updateLesson,
   deleteLesson,
-} from "../controllers/itemController.js";
+} from "../controllers/lessonController.js";
 const router = express.Router();
 router.get("/", getAllLessons);
 router.get("/:id", getLessonById);

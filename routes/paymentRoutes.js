@@ -5,7 +5,7 @@ import {
   createPayment,
   updatePayment,
   deletePayment,
-} from "../controllers/itemController.js";
+} from "../controllers/paymentController.js";
 const router = express.Router();
 router.get("/", getAllPayments);
 router.get("/:id", getPaymentById);

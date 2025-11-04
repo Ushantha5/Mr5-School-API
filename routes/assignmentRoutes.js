@@ -5,7 +5,7 @@ import {
   createAssignment,
   updateAssignment,
   deleteAssignment,
-} from "../controllers/itemController.js";
+} from "../controllers/assignmentController.js";
 const router = express.Router();
 router.get("/", getAllAssignments);
 router.get("/:id", getAssignmentById);
