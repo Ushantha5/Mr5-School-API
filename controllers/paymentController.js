@@ -1,7 +1,7 @@
 import Payment from "../models/Payment.js";
 
 // Change: getAllpayment → getAllPayments
-export const getAllPayments = async (req, res) => {
+const getAllPayments = async (req, res) => {
   try {
     const payment = await Payment.find();
 
@@ -20,7 +20,7 @@ export const getAllPayments = async (req, res) => {
 };
 
 // Change: getitemById → getPaymentById
-export const getPaymentById = async (req, res) => {
+const getPaymentById = async (req, res) => {
   try {
     const payment = await Payment.findById(req.params.id);
 
@@ -52,7 +52,7 @@ export const getPaymentById = async (req, res) => {
 };
 
 // Change: createitem → createPayment
-export const createPayment = async (req, res) => {
+const createPayment = async (req, res) => {
   try {
     const newitem = new Payment(req.body);
     const saveditem = await newitem.save();
@@ -82,7 +82,7 @@ export const createPayment = async (req, res) => {
 };
 
 // Change: updateitem → updatePayment
-export const updatePayment = async (req, res) => {
+const updatePayment = async (req, res) => {
   try {
     const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -123,7 +123,7 @@ export const updatePayment = async (req, res) => {
 };
 
 // Change: deleteitem → deletePayment
-export const deletePayment = async (req, res) => {
+const deletePayment = async (req, res) => {
   try {
     const payment = await Payment.findByIdAndDelete(req.params.id);
 
@@ -150,4 +150,12 @@ export const deletePayment = async (req, res) => {
       error: "Failed to delete item",
     });
   }
+};
+
+export {
+  getAllPayments,
+  getPaymentById,
+  createPayment,
+  updatePayment,
+  deletePayment,
 };

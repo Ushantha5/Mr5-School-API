@@ -1,7 +1,7 @@
 import Enrollment from "../models/Enrollment.js";
 
 // Change: getAllenrollment → getAllEnrollments
-export const getAllEnrollments = async (req, res) => {
+const getAllEnrollments = async (req, res) => {
   try {
     const enrollment = await Enrollment.find();
 
@@ -20,7 +20,7 @@ export const getAllEnrollments = async (req, res) => {
 };
 
 // Change: getitemById → getEnrollmentById
-export const getEnrollmentById = async (req, res) => {
+const getEnrollmentById = async (req, res) => {
   try {
     const enrollment = await Enrollment.findById(req.params.id);
 
@@ -52,7 +52,7 @@ export const getEnrollmentById = async (req, res) => {
 };
 
 // Change: createitem → createEnrollment
-export const createEnrollment = async (req, res) => {
+const createEnrollment = async (req, res) => {
   try {
     const newitem = new Enrollment(req.body);
     const saveditem = await newitem.save();
@@ -82,7 +82,7 @@ export const createEnrollment = async (req, res) => {
 };
 
 // Change: updateitem → updateEnrollment
-export const updateEnrollment = async (req, res) => {
+const updateEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndUpdate(
       req.params.id,
@@ -127,7 +127,7 @@ export const updateEnrollment = async (req, res) => {
 };
 
 // Change: deleteitem → deleteEnrollment
-export const deleteEnrollment = async (req, res) => {
+const deleteEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
 
@@ -154,4 +154,12 @@ export const deleteEnrollment = async (req, res) => {
       error: "Failed to delete item",
     });
   }
+};
+
+export {
+  getAllEnrollments,
+  getEnrollmentById,
+  createEnrollment,
+  updateEnrollment,
+  deleteEnrollment,
 };

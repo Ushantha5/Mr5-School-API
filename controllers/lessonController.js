@@ -1,7 +1,7 @@
 import Lesson from "../models/Lesson.js";
 
 // Change: getAlllesson → getAllLessons
-export const getAllLessons = async (req, res) => {
+const getAllLessons = async (req, res) => {
   try {
     const lesson = await Lesson.find();
 
@@ -20,7 +20,7 @@ export const getAllLessons = async (req, res) => {
 };
 
 // Change: getitemById → getLessonById
-export const getLessonById = async (req, res) => {
+const getLessonById = async (req, res) => {
   try {
     const lesson = await Lesson.findById(req.params.id);
 
@@ -52,7 +52,7 @@ export const getLessonById = async (req, res) => {
 };
 
 // Change: createitem → createLesson
-export const createLesson = async (req, res) => {
+const createLesson = async (req, res) => {
   try {
     const newitem = new Lesson(req.body);
     const saveditem = await newitem.save();
@@ -82,7 +82,7 @@ export const createLesson = async (req, res) => {
 };
 
 // Change: updateitem → updateLesson
-export const updateLesson = async (req, res) => {
+const updateLesson = async (req, res) => {
   try {
     const lesson = await Lesson.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -123,7 +123,7 @@ export const updateLesson = async (req, res) => {
 };
 
 // Change: deleteitem → deleteLesson
-export const deleteLesson = async (req, res) => {
+const deleteLesson = async (req, res) => {
   try {
     const lesson = await Lesson.findByIdAndDelete(req.params.id);
 
@@ -150,4 +150,12 @@ export const deleteLesson = async (req, res) => {
       error: "Failed to delete item",
     });
   }
+};
+
+export {
+  getAllLessons,
+  getLessonById,
+  createLesson,
+  updateLesson,
+  deleteLesson,
 };

@@ -1,40 +1,40 @@
-import User from "../models/User.js";
+import Course from "../models/Course.js";
 
-// Change: getAlluser → getAllUsers
-export const getAllUsers = async (req, res) => {
+// Change: getAllcours → getAllCourses
+const getAllCourses = async (req, res) => {
   try {
-    const user = await User.find();
+    const cours = await Course.find();
 
     res.status(200).json({
       success: true,
-      count: user.length,
-      data: user,
+      count: cours.length,
+      data: cours,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error user ",
+      message: "Error cours ",
       error: error.message,
     });
   }
 };
 
-// Change: getitemById → getUserById
-export const getUserById = async (req, res) => {
+// Change: getitemById → getCourseById
+const getCourseById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const cours = await Course.findById(req.params.id);
 
-    if (!user) {
-      // Changed from !User to !user
+    if (!cours) {
+      // Changed from !Course to !cours
       return res.status(404).json({
         success: false,
-        error: "User not found",
+        error: "Course not found",
       });
     }
 
     res.json({
       success: true,
-      data: User,
+      data: Course,
     });
   } catch (error) {
     if (error.name === "CastError") {
@@ -51,10 +51,10 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// Change: createitem → createUser
-export const createUser = async (req, res) => {
+// Change: createitem → createCourse
+const createCourse = async (req, res) => {
   try {
-    const newitem = new User(req.body);
+    const newitem = new Course(req.body);
     const saveditem = await newitem.save();
 
     res.status(201).json({
@@ -81,16 +81,16 @@ export const createUser = async (req, res) => {
   }
 };
 
-// Change: updateitem → updateUser
-export const updateUser = async (req, res) => {
+// Change: updateitem → updateCourse
+const updateCourse = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const cours = await Course.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
 
-    if (!user) {
-      // Changed from !User to !user
+    if (!cours) {
+      // Changed from !Course to !cours
       return res.status(404).json({
         success: false,
         error: "item not found",
@@ -99,7 +99,7 @@ export const updateUser = async (req, res) => {
 
     res.json({
       success: true,
-      data: user,
+      data: cours,
     });
   } catch (error) {
     if (error.name === "CastError") {
@@ -122,12 +122,12 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// Change: deleteitem → deleteUser
-export const deleteUser = async (req, res) => {
+// Change: deleteitem → deleteCourse
+const deleteCourse = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const cours = await Course.findByIdAndDelete(req.params.id);
 
-    if (!user) {
+    if (!cours) {
       return res.status(404).json({
         success: false,
         error: "item not found",
@@ -150,4 +150,12 @@ export const deleteUser = async (req, res) => {
       error: "Failed to delete item",
     });
   }
+};
+
+export {
+  getAllCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
+  deleteCourse,
 };

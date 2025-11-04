@@ -5,7 +5,7 @@ import {
   createAi_Assistant_Interction,
   updateAi_Assistant_Interction,
   deleteAi_Assistant_Interction,
-} from "../controllers/itemController.js";
+} from "../controllers/ai_Assistant_InteractionController.js";
 const router = express.Router();
 router.get("/", getAllAi_Assistant_Interctions);
 router.get("/:id", getAi_Assistant_InterctionById);

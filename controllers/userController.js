@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 
 // Change: getAlluser → getAllUsers
-export const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
     const user = await User.find();
 
@@ -20,7 +20,7 @@ export const getAllUsers = async (req, res) => {
 };
 
 // Change: getitemById → getUserById
-export const getUserById = async (req, res) => {
+const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -52,7 +52,7 @@ export const getUserById = async (req, res) => {
 };
 
 // Change: createitem → createUser
-export const createUser = async (req, res) => {
+const createUser = async (req, res) => {
   try {
     const newitem = new User(req.body);
     const saveditem = await newitem.save();
@@ -82,7 +82,7 @@ export const createUser = async (req, res) => {
 };
 
 // Change: updateitem → updateUser
-export const updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -123,7 +123,7 @@ export const updateUser = async (req, res) => {
 };
 
 // Change: deleteitem → deleteUser
-export const deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
 
@@ -151,3 +151,5 @@ export const deleteUser = async (req, res) => {
     });
   }
 };
+
+export { getAllUsers, getUserById, createUser, updateUser, deleteUser };

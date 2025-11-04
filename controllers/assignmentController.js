@@ -1,7 +1,7 @@
 import Assignment from "../models/Assignment.js";
 
 // Change: getAllassignment → getAllAssignments
-export const getAllAssignments = async (req, res) => {
+const getAllAssignments = async (req, res) => {
   try {
     const assignment = await Assignment.find();
 
@@ -20,7 +20,7 @@ export const getAllAssignments = async (req, res) => {
 };
 
 // Change: getitemById → getAssignmentById
-export const getAssignmentById = async (req, res) => {
+const getAssignmentById = async (req, res) => {
   try {
     const assignment = await Assignment.findById(req.params.id);
 
@@ -52,7 +52,7 @@ export const getAssignmentById = async (req, res) => {
 };
 
 // Change: createitem → createAssignment
-export const createAssignment = async (req, res) => {
+const createAssignment = async (req, res) => {
   try {
     const newitem = new Assignment(req.body);
     const saveditem = await newitem.save();
@@ -82,7 +82,7 @@ export const createAssignment = async (req, res) => {
 };
 
 // Change: updateitem → updateAssignment
-export const updateAssignment = async (req, res) => {
+const updateAssignment = async (req, res) => {
   try {
     const assignment = await Assignment.findByIdAndUpdate(
       req.params.id,
@@ -127,7 +127,7 @@ export const updateAssignment = async (req, res) => {
 };
 
 // Change: deleteitem → deleteAssignment
-export const deleteAssignment = async (req, res) => {
+const deleteAssignment = async (req, res) => {
   try {
     const assignment = await Assignment.findByIdAndDelete(req.params.id);
 
@@ -154,4 +154,12 @@ export const deleteAssignment = async (req, res) => {
       error: "Failed to delete item",
     });
   }
+};
+
+export {
+  getAllAssignments,
+  getAssignmentById,
+  createAssignment,
+  updateAssignment,
+  deleteAssignment,
 };

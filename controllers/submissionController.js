@@ -1,7 +1,7 @@
 import Submission from "../models/Submission.js";
 
 // Change: getAllsubmission → getAllSubmissions
-export const getAllSubmissions = async (req, res) => {
+const getAllSubmissions = async (req, res) => {
   try {
     const submission = await Submission.find();
 
@@ -20,7 +20,7 @@ export const getAllSubmissions = async (req, res) => {
 };
 
 // Change: getitemById → getSubmissionById
-export const getSubmissionById = async (req, res) => {
+const getSubmissionById = async (req, res) => {
   try {
     const submission = await Submission.findById(req.params.id);
 
@@ -52,7 +52,7 @@ export const getSubmissionById = async (req, res) => {
 };
 
 // Change: createitem → createSubmission
-export const createSubmission = async (req, res) => {
+const createSubmission = async (req, res) => {
   try {
     const newitem = new Submission(req.body);
     const saveditem = await newitem.save();
@@ -82,7 +82,7 @@ export const createSubmission = async (req, res) => {
 };
 
 // Change: updateitem → updateSubmission
-export const updateSubmission = async (req, res) => {
+const updateSubmission = async (req, res) => {
   try {
     const submission = await Submission.findByIdAndUpdate(
       req.params.id,
@@ -127,7 +127,7 @@ export const updateSubmission = async (req, res) => {
 };
 
 // Change: deleteitem → deleteSubmission
-export const deleteSubmission = async (req, res) => {
+const deleteSubmission = async (req, res) => {
   try {
     const submission = await Submission.findByIdAndDelete(req.params.id);
 
@@ -154,4 +154,12 @@ export const deleteSubmission = async (req, res) => {
       error: "Failed to delete item",
     });
   }
+};
+
+export {
+  getAllSubmissions,
+  getSubmissionById,
+  createSubmission,
+  updateSubmission,
+  deleteSubmission,
 };

@@ -5,7 +5,7 @@ import {
   createSubmission,
   updateSubmission,
   deleteSubmission,
-} from "../controllers/itemController.js";
+} from "../controllers/submissionController.js";
 const router = express.Router();
 router.get("/", getAllSubmissions);
 router.get("/:id", getSubmissionById);

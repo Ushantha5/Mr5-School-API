@@ -1,7 +1,7 @@
-import Ai_Assistant_Interction from "../models/Ai_Assistant_Interction.js";
+import Ai_Assistant_Interction from "../models/AI_Assistant_Interaction.js";
 
 // Change: getAllai_Assisstant_Interction → getAllAi_Assistant_Interctions
-export const getAllAi_Assistant_Interctions = async (req, res) => {
+const getAllAi_Assistant_Interctions = async (req, res) => {
   try {
     const ai_Assisstant_Interction = await Ai_Assistant_Interction.find();
 
@@ -20,7 +20,7 @@ export const getAllAi_Assistant_Interctions = async (req, res) => {
 };
 
 // Change: getitemById → getAi_Assistant_InterctionById
-export const getAi_Assistant_InterctionById = async (req, res) => {
+const getAi_Assistant_InterctionById = async (req, res) => {
   try {
     const ai_Assisstant_Interction = await Ai_Assistant_Interction.findById(
       req.params.id
@@ -54,7 +54,7 @@ export const getAi_Assistant_InterctionById = async (req, res) => {
 };
 
 // Change: createitem → createAi_Assistant_Interction
-export const createAi_Assistant_Interction = async (req, res) => {
+const createAi_Assistant_Interction = async (req, res) => {
   try {
     const newitem = new Ai_Assistant_Interction(req.body);
     const saveditem = await newitem.save();
@@ -84,7 +84,7 @@ export const createAi_Assistant_Interction = async (req, res) => {
 };
 
 // Change: updateitem → updateAi_Assistant_Interction
-export const updateAi_Assistant_Interction = async (req, res) => {
+const updateAi_Assistant_Interction = async (req, res) => {
   try {
     const ai_Assisstant_Interction =
       await Ai_Assistant_Interction.findByIdAndUpdate(req.params.id, req.body, {
@@ -126,7 +126,7 @@ export const updateAi_Assistant_Interction = async (req, res) => {
 };
 
 // Change: deleteitem → deleteAi_Assistant_Interction
-export const deleteAi_Assistant_Interction = async (req, res) => {
+const deleteAi_Assistant_Interction = async (req, res) => {
   try {
     const ai_Assisstant_Interction =
       await Ai_Assistant_Interction.findByIdAndDelete(req.params.id);
@@ -154,4 +154,12 @@ export const deleteAi_Assistant_Interction = async (req, res) => {
       error: "Failed to delete item",
     });
   }
+};
+
+export {
+  getAllAi_Assistant_Interctions,
+  getAi_Assistant_InterctionById,
+  createAi_Assistant_Interction,
+  updateAi_Assistant_Interction,
+  deleteAi_Assistant_Interction,
 };
