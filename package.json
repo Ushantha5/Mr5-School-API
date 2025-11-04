@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +17,8 @@
     "express": "^5.1.0",
     "mongoose": "^8.19.2",
     "mongot": "^1.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
