@@ -1,21 +1,18 @@
 import Course from "../models/Course.js";
 
-// Change: getAllcours → getAllCourses
 const getAllCourses = async (req, res) => {
   try {
-    const cours = await Course.find();
+    const courses = await Course.find()
+      .populate("teacher", "name email")
+      .sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
-      count: cours.length,
-      data: cours,
-    });
+    res
+      .status(200)
+      .json({ success: true, count: courses.length, data: courses });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error cours ",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching courses", error });
   }
 };
 

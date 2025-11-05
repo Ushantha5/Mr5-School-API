@@ -1,19 +1,21 @@
 import Lesson from "../models/Lesson.js";
 
-// Change: getAlllesson → getAllLessons
 const getAllLessons = async (req, res) => {
   try {
-    const lesson = await Lesson.find();
+    const lessons = await Lesson.find().populate(
+      "course",
+      "title description teacher"
+    );
 
     res.status(200).json({
       success: true,
-      count: lesson.length,
-      data: lesson,
+      count: lessons.length,
+      data: lessons,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error lesson ",
+      message: "Error fetching lessons",
       error: error.message,
     });
   }

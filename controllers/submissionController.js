@@ -1,19 +1,20 @@
 import Submission from "../models/Submission.js";
 
-// Change: getAllsubmission → getAllSubmissions
 const getAllSubmissions = async (req, res) => {
   try {
-    const submission = await Submission.find();
+    const submissions = await Submission.find()
+      .populate("assignment", "title dueDate")
+      .populate("student", "name email");
 
     res.status(200).json({
       success: true,
-      count: submission.length,
-      data: submission,
+      count: submissions.length,
+      data: submissions,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error submission ",
+      message: "Error fetching submissions",
       error: error.message,
     });
   }

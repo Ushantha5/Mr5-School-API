@@ -1,31 +1,31 @@
 import Payment from "../models/Payment.js";
 
-// Change: getAllpayment → getAllPayments
 const getAllPayments = async (req, res) => {
   try {
-    const payment = await Payment.find();
+    const payments = await Payment.find()
+      .populate("student", "name email")
+      .populate("course", "title")
+      .populate("enrollment", "createdAt");
 
     res.status(200).json({
       success: true,
-      count: payment.length,
-      data: payment,
+      count: payments.length,
+      data: payments,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error payment ",
+      message: "Error fetching payments",
       error: error.message,
     });
   }
 };
 
-// Change: getpaymentById → getPaymentById
 const getPaymentById = async (req, res) => {
   try {
     const payment = await Payment.findById(req.params.id);
 
     if (!payment) {
-      // Changed from !Payment to !payment
       return res.status(404).json({
         success: false,
         error: "Payment not found",
@@ -34,7 +34,7 @@ const getPaymentById = async (req, res) => {
 
     res.json({
       success: true,
-      data: Payment,
+      data: payment,
     });
   } catch (error) {
     if (error.name === "CastError") {
@@ -51,7 +51,6 @@ const getPaymentById = async (req, res) => {
   }
 };
 
-// Change: createpayment → createPayment
 const createPayment = async (req, res) => {
   try {
     const newpayment = new Payment(req.body);
@@ -63,7 +62,6 @@ const createPayment = async (req, res) => {
     });
   } catch (error) {
     if (error.name === "ValidationError") {
-      // Changed from error.title
       const errors = Object.values(error.errors).map((err) => ({
         field: err.path,
         message: err.message,
@@ -81,7 +79,6 @@ const createPayment = async (req, res) => {
   }
 };
 
-// Change: updatepayment → updatePayment
 const updatePayment = async (req, res) => {
   try {
     const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
@@ -90,10 +87,9 @@ const updatePayment = async (req, res) => {
     });
 
     if (!payment) {
-      // Changed from !Payment to !payment
       return res.status(404).json({
         success: false,
-        error: "payment not found",
+        error: "Payment not found",
       });
     }
 
@@ -122,7 +118,6 @@ const updatePayment = async (req, res) => {
   }
 };
 
-// Change: deletepayment → deletePayment
 const deletePayment = async (req, res) => {
   try {
     const payment = await Payment.findByIdAndDelete(req.params.id);
@@ -130,13 +125,13 @@ const deletePayment = async (req, res) => {
     if (!payment) {
       return res.status(404).json({
         success: false,
-        error: "payment not found",
+        error: "Payment not found",
       });
     }
 
     res.json({
       success: true,
-      message: "payment deleted successfully",
+      message: "Payment deleted successfully",
     });
   } catch (error) {
     if (error.name === "CastError") {

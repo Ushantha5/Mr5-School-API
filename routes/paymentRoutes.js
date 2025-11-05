@@ -6,7 +6,9 @@ import {
   updatePayment,
   deletePayment,
 } from "../controllers/paymentController.js";
+
 const router = express.Router();
+
 router.get("/", getAllPayments);
 router.get("/:id", getPaymentById);
 router.post("/", createPayment);

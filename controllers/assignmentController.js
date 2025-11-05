@@ -1,19 +1,19 @@
-import Assignment from "../models/Assignment.js";
-
-// Change: getAllassignment → getAllAssignments
 const getAllAssignments = async (req, res) => {
   try {
-    const assignment = await Assignment.find();
+    const assignments = await Assignment.find()
+      .populate("course", "title description")
+      .populate("student", "name email")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      count: assignment.length,
-      data: assignment,
+      count: assignments.length,
+      data: assignments,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error assignment ",
+      message: "Error fetching assignments",
       error: error.message,
     });
   }

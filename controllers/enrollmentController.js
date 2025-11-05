@@ -1,19 +1,21 @@
 import Enrollment from "../models/Enrollment.js";
 
-// Change: getAllenrollment → getAllEnrollments
 const getAllEnrollments = async (req, res) => {
   try {
-    const enrollment = await Enrollment.find();
+    const enrollments = await Enrollment.find()
+      .populate("student", "name email") // show name + email from User
+      .populate("course", "title description") // show title + description
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      count: enrollment.length,
-      data: enrollment,
+      count: enrollments.length,
+      data: enrollments,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error enrollment ",
+      message: "Error fetching enrollments",
       error: error.message,
     });
   }

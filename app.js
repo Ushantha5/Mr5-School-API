@@ -14,7 +14,6 @@ import aI_Assistant_InterctionRoutes from "./routes/aI_Assistant_InterctionRoute
 
 dotenv.config();
 
-// dotenv.config();
 connectDB();
 
 const app = express();
