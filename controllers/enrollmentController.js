@@ -1,162 +1,137 @@
 import Enrollment from "../models/Enrollment.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
+import { paginate } from "../utils/pagination.js";
 
-const getAllEnrollments = async (req, res) => {
-  try {
-    const enrollments = await Enrollment.find()
-      .populate("student", "name email") // show name + email from User
-      .populate("course", "title description") // show title + description
-      .sort({ createdAt: -1 });
+// @desc    Get all enrollments with pagination
+// @route   GET /api/enrollments
+// @access  Private
+const getAllEnrollments = asyncHandler(async (req, res) => {
+  const { page, limit, student, course, status } = req.query;
 
-    res.status(200).json({
-      success: true,
-      count: enrollments.length,
-      data: enrollments,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching enrollments",
-      error: error.message,
-    });
-  }
-};
+  // Build query
+  const query = {};
+  if (student) query.student = student;
+  if (course) query.course = course;
+  if (status) query.status = status;
 
-// Change: getenrollmentById → getEnrollmentById
-const getEnrollmentById = async (req, res) => {
-  try {
-    const enrollment = await Enrollment.findById(req.params.id);
-
-    if (!enrollment) {
-      // Changed from !Enrollment to !enrollment
-      return res.status(404).json({
-        success: false,
-        error: "Enrollment not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: Enrollment,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid enrollment ID format",
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch enrollment",
-    });
-  }
-};
-
-// Change: createenrollment → createEnrollment
-const createEnrollment = async (req, res) => {
-  try {
-    const newenrollment = new Enrollment(req.body);
-    const savedenrollment = await newenrollment.save();
-
-    res.status(201).json({
-      success: true,
-      data: savedenrollment,
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      // Changed from error.title
-      const errors = Object.values(error.errors).map((err) => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return res.status(400).json({
-        success: false,
-        error: "Validation failed",
-        details: errors,
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to create enrollment",
-    });
-  }
-};
-
-// Change: updateenrollment → updateEnrollment
-const updateEnrollment = async (req, res) => {
-  try {
-    const enrollment = await Enrollment.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+  const result = await paginate(Enrollment, query, {
+    page,
+    limit,
+    sort: "-createdAt",
+    populate: [
+      { path: "student", select: "name email profileImage" },
       {
-        new: true,
-        runValidators: true,
-      }
-    );
+        path: "course",
+        select: "title description thumbnail price level teacher",
+        populate: { path: "teacher", select: "name email" },
+      },
+    ],
+  });
 
-    if (!enrollment) {
-      // Changed from !Enrollment to !enrollment
-      return res.status(404).json({
-        success: false,
-        error: "enrollment not found",
-      });
-    }
+  res.status(200).json({
+    success: true,
+    ...result,
+  });
+});
 
-    res.json({
-      success: true,
-      data: enrollment,
+// @desc    Get enrollment by ID
+// @route   GET /api/enrollments/:id
+// @access  Private
+const getEnrollmentById = asyncHandler(async (req, res) => {
+  const enrollment = await Enrollment.findById(req.params.id)
+    .populate("student", "name email profileImage")
+    .populate({
+      path: "course",
+      select: "title description thumbnail price level teacher",
+      populate: { path: "teacher", select: "name email" },
     });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid enrollment ID format",
-      });
-    }
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        errors,
-      });
-    }
-    res.status(500).json({
+
+  if (!enrollment) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to update enrollment",
+      error: "Enrollment not found",
     });
   }
-};
 
-// Change: deleteenrollment → deleteEnrollment
-const deleteEnrollment = async (req, res) => {
-  try {
-    const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
+  res.json({
+    success: true,
+    data: enrollment,
+  });
+});
 
-    if (!enrollment) {
-      return res.status(404).json({
-        success: false,
-        error: "enrollment not found",
-      });
-    }
+// @desc    Create enrollment
+// @route   POST /api/enrollments
+// @access  Private
+const createEnrollment = asyncHandler(async (req, res) => {
+  const newenrollment = new Enrollment(req.body);
+  const savedenrollment = await newenrollment.save();
 
-    res.json({
-      success: true,
-      message: "enrollment deleted successfully",
+  const populatedEnrollment = await Enrollment.findById(
+    savedenrollment._id
+  )
+    .populate("student", "name email profileImage")
+    .populate({
+      path: "course",
+      select: "title description thumbnail price level teacher",
+      populate: { path: "teacher", select: "name email" },
     });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid enrollment ID format",
-      });
+
+  res.status(201).json({
+    success: true,
+    data: populatedEnrollment,
+  });
+});
+
+// @desc    Update enrollment
+// @route   PUT /api/enrollments/:id
+// @access  Private
+const updateEnrollment = asyncHandler(async (req, res) => {
+  const enrollment = await Enrollment.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
     }
-    res.status(500).json({
+  )
+    .populate("student", "name email profileImage")
+    .populate({
+      path: "course",
+      select: "title description thumbnail price level teacher",
+      populate: { path: "teacher", select: "name email" },
+    });
+
+  if (!enrollment) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to delete enrollment",
+      error: "Enrollment not found",
     });
   }
-};
+
+  res.json({
+    success: true,
+    data: enrollment,
+  });
+});
+
+// @desc    Delete enrollment
+// @route   DELETE /api/enrollments/:id
+// @access  Private
+const deleteEnrollment = asyncHandler(async (req, res) => {
+  const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
+
+  if (!enrollment) {
+    return res.status(404).json({
+      success: false,
+      error: "Enrollment not found",
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "Enrollment deleted successfully",
+  });
+});
 
 export {
   getAllEnrollments,

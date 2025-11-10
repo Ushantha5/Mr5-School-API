@@ -1,155 +1,106 @@
 import User from "../models/User.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
+import { paginate } from "../utils/pagination.js";
 
-// Change: getAlluser → getAllUsers
-const getAllUsers = async (req, res) => {
-  try {
-    const user = await User.find();
+// @desc    Get all users with pagination
+// @route   GET /api/users
+// @access  Private/Admin
+const getAllUsers = asyncHandler(async (req, res) => {
+  const { page, limit, role, search } = req.query;
 
-    res.status(200).json({
-      success: true,
-      count: user.length,
-      data: user,
-    });
-  } catch (error) {
-    res.status(500).json({
+  // Build query
+  const query = {};
+  if (role) query.role = role;
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const result = await paginate(User, query, {
+    page,
+    limit,
+    sort: "-createdAt",
+  });
+
+  res.status(200).json({
+    success: true,
+    ...result,
+  });
+});
+
+// @desc    Get user by ID
+// @route   GET /api/users/:id
+// @access  Private
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return res.status(404).json({
       success: false,
-      message: "Error user ",
-      error: error.message,
+      error: "User not found",
     });
   }
-};
 
-// Change: getuserById → getUserById
-const getUserById = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
+  res.json({
+    success: true,
+    data: user,
+  });
+});
 
-    if (!user) {
-      // Changed from !User to !user
-      return res.status(404).json({
-        success: false,
-        error: "User not found",
-      });
-    }
+// @desc    Create user
+// @route   POST /api/users
+// @access  Private/Admin
+const createUser = asyncHandler(async (req, res) => {
+  const newuser = new User(req.body);
+  const saveduser = await newuser.save();
 
-    res.json({
-      success: true,
-      data: User,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid user ID format",
-      });
-    }
+  res.status(201).json({
+    success: true,
+    data: saveduser,
+  });
+});
 
-    res.status(500).json({
+// @desc    Update user
+// @route   PUT /api/users/:id
+// @access  Private
+const updateUser = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!user) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to fetch user",
+      error: "User not found",
     });
   }
-};
 
-// Change: createuser → createUser
-const createUser = async (req, res) => {
-  try {
-    const newuser = new User(req.body);
-    const saveduser = await newuser.save();
+  res.json({
+    success: true,
+    data: user,
+  });
+});
 
-    res.status(201).json({
-      success: true,
-      data: saveduser,
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      // Changed from error.title
-      const errors = Object.values(error.errors).map((err) => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return res.status(400).json({
-        success: false,
-        error: "Validation failed",
-        details: errors,
-      });
-    }
-    res.status(500).json({
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+
+  if (!user) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to create user",
+      error: "User not found",
     });
   }
-};
 
-// Change: updateuser → updateUser
-const updateUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!user) {
-      // Changed from !User to !user
-      return res.status(404).json({
-        success: false,
-        error: "user not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: user,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid user ID format",
-      });
-    }
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        errors,
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to update user",
-    });
-  }
-};
-
-// Change: deleteuser → deleteUser
-const deleteUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: "user not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "user deleted successfully",
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid user ID format",
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to delete user",
-    });
-  }
-};
+  res.json({
+    success: true,
+    message: "User deleted successfully",
+  });
+});
 
 export { getAllUsers, getUserById, createUser, updateUser, deleteUser };

@@ -1,151 +1,147 @@
 import Payment from "../models/Payment.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
+import { paginate } from "../utils/pagination.js";
 
-const getAllPayments = async (req, res) => {
-  try {
-    const payments = await Payment.find()
-      .populate("student", "name email")
-      .populate("course", "title")
-      .populate("enrollment", "createdAt");
+// @desc    Get all payments with pagination
+// @route   GET /api/payments
+// @access  Private/Admin
+const getAllPayments = asyncHandler(async (req, res) => {
+  const { page, limit, user, course, status, method } = req.query;
 
-    res.status(200).json({
-      success: true,
-      count: payments.length,
-      data: payments,
+  // Build query
+  const query = {};
+  if (user) query.user = user;
+  if (course) query.course = course;
+  if (status) query.status = status;
+  if (method) query.method = method;
+
+  const result = await paginate(Payment, query, {
+    page,
+    limit,
+    sort: "-createdAt",
+    populate: [
+      {
+        path: "user",
+        select: "name email profileImage",
+      },
+      {
+        path: "course",
+        select: "title description thumbnail price",
+        populate: {
+          path: "teacher",
+          select: "name email",
+        },
+      },
+    ],
+  });
+
+  res.status(200).json({
+    success: true,
+    ...result,
+  });
+});
+
+// @desc    Get payment by ID
+// @route   GET /api/payments/:id
+// @access  Private
+const getPaymentById = asyncHandler(async (req, res) => {
+  const payment = await Payment.findById(req.params.id)
+    .populate("user", "name email profileImage")
+    .populate({
+      path: "course",
+      select: "title description thumbnail price teacher",
+      populate: {
+        path: "teacher",
+        select: "name email",
+      },
     });
-  } catch (error) {
-    res.status(500).json({
+
+  if (!payment) {
+    return res.status(404).json({
       success: false,
-      message: "Error fetching payments",
-      error: error.message,
+      error: "Payment not found",
     });
   }
-};
 
-const getPaymentById = async (req, res) => {
-  try {
-    const payment = await Payment.findById(req.params.id);
+  res.json({
+    success: true,
+    data: payment,
+  });
+});
 
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        error: "Payment not found",
-      });
-    }
+// @desc    Create payment
+// @route   POST /api/payments
+// @access  Private
+const createPayment = asyncHandler(async (req, res) => {
+  const newpayment = new Payment(req.body);
+  const savedpayment = await newpayment.save();
 
-    res.json({
-      success: true,
-      data: payment,
+  const populatedPayment = await Payment.findById(savedpayment._id)
+    .populate("user", "name email profileImage")
+    .populate({
+      path: "course",
+      select: "title description thumbnail price",
+      populate: {
+        path: "teacher",
+        select: "name email",
+      },
     });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid payment ID format",
-      });
-    }
 
-    res.status(500).json({
+  res.status(201).json({
+    success: true,
+    data: populatedPayment,
+  });
+});
+
+// @desc    Update payment
+// @route   PUT /api/payments/:id
+// @access  Private/Admin
+const updatePayment = asyncHandler(async (req, res) => {
+  const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+    .populate("user", "name email profileImage")
+    .populate({
+      path: "course",
+      select: "title description thumbnail price",
+      populate: {
+        path: "teacher",
+        select: "name email",
+      },
+    });
+
+  if (!payment) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to fetch payment",
+      error: "Payment not found",
     });
   }
-};
 
-const createPayment = async (req, res) => {
-  try {
-    const newpayment = new Payment(req.body);
-    const savedpayment = await newpayment.save();
+  res.json({
+    success: true,
+    data: payment,
+  });
+});
 
-    res.status(201).json({
-      success: true,
-      data: savedpayment,
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return res.status(400).json({
-        success: false,
-        error: "Validation failed",
-        details: errors,
-      });
-    }
-    res.status(500).json({
+// @desc    Delete payment
+// @route   DELETE /api/payments/:id
+// @access  Private/Admin
+const deletePayment = asyncHandler(async (req, res) => {
+  const payment = await Payment.findByIdAndDelete(req.params.id);
+
+  if (!payment) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to create payment",
+      error: "Payment not found",
     });
   }
-};
 
-const updatePayment = async (req, res) => {
-  try {
-    const payment = await Payment.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        error: "Payment not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: payment,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid payment ID format",
-      });
-    }
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        errors,
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to update payment",
-    });
-  }
-};
-
-const deletePayment = async (req, res) => {
-  try {
-    const payment = await Payment.findByIdAndDelete(req.params.id);
-
-    if (!payment) {
-      return res.status(404).json({
-        success: false,
-        error: "Payment not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Payment deleted successfully",
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid payment ID format",
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to delete payment",
-    });
-  }
-};
+  res.json({
+    success: true,
+    message: "Payment deleted successfully",
+  });
+});
 
 export {
   getAllPayments,

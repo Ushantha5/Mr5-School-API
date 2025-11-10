@@ -1,160 +1,132 @@
-const getAllAssignments = async (req, res) => {
-  try {
-    const assignments = await Assignment.find()
-      .populate("course", "title description")
-      .populate("student", "name email")
-      .sort({ createdAt: -1 });
+import Assignment from "../models/Assignment.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
+import { paginate } from "../utils/pagination.js";
 
-    res.status(200).json({
-      success: true,
-      count: assignments.length,
-      data: assignments,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching assignments",
-      error: error.message,
-    });
+// @desc    Get all assignments with pagination
+// @route   GET /api/assignments
+// @access  Private
+const getAllAssignments = asyncHandler(async (req, res) => {
+  const { page, limit, course, teacher, search } = req.query;
+
+  // Build query
+  const query = {};
+  if (course) query.course = course;
+  if (teacher) query.teacher = teacher;
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
   }
-};
 
-// Change: getassignmentById → getAssignmentById
-const getAssignmentById = async (req, res) => {
-  try {
-    const assignment = await Assignment.findById(req.params.id);
-
-    if (!assignment) {
-      // Changed from !Assignment to !assignment
-      return res.status(404).json({
-        success: false,
-        error: "Assignment not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: Assignment,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid assignment ID format",
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch assignment",
-    });
-  }
-};
-
-// Change: createassignment → createAssignment
-const createAssignment = async (req, res) => {
-  try {
-    const newassignment = new Assignment(req.body);
-    const savedassignment = await newassignment.save();
-
-    res.status(201).json({
-      success: true,
-      data: savedassignment,
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      // Changed from error.title
-      const errors = Object.values(error.errors).map((err) => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return res.status(400).json({
-        success: false,
-        error: "Validation failed",
-        details: errors,
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to create assignment",
-    });
-  }
-};
-
-// Change: updateassignment → updateAssignment
-const updateAssignment = async (req, res) => {
-  try {
-    const assignment = await Assignment.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+  const result = await paginate(Assignment, query, {
+    page,
+    limit,
+    sort: "-createdAt",
+    populate: [
       {
-        new: true,
-        runValidators: true,
-      }
-    );
+        path: "course",
+        select: "title description thumbnail level",
+      },
+      {
+        path: "teacher",
+        select: "name email profileImage",
+      },
+    ],
+  });
 
-    if (!assignment) {
-      // Changed from !Assignment to !assignment
-      return res.status(404).json({
-        success: false,
-        error: "assignment not found",
-      });
-    }
+  res.status(200).json({
+    success: true,
+    ...result,
+  });
+});
 
-    res.json({
-      success: true,
-      data: assignment,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid assignment ID format",
-      });
-    }
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        errors,
-      });
-    }
-    res.status(500).json({
+// @desc    Get assignment by ID
+// @route   GET /api/assignments/:id
+// @access  Private
+const getAssignmentById = asyncHandler(async (req, res) => {
+  const assignment = await Assignment.findById(req.params.id)
+    .populate("course", "title description thumbnail level teacher")
+    .populate("teacher", "name email profileImage");
+
+  if (!assignment) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to update assignment",
+      error: "Assignment not found",
     });
   }
-};
 
-// Change: deleteassignment → deleteAssignment
-const deleteAssignment = async (req, res) => {
-  try {
-    const assignment = await Assignment.findByIdAndDelete(req.params.id);
+  res.json({
+    success: true,
+    data: assignment,
+  });
+});
 
-    if (!assignment) {
-      return res.status(404).json({
-        success: false,
-        error: "assignment not found",
-      });
+// @desc    Create assignment
+// @route   POST /api/assignments
+// @access  Private/Teacher/Admin
+const createAssignment = asyncHandler(async (req, res) => {
+  const newassignment = new Assignment(req.body);
+  const savedassignment = await newassignment.save();
+
+  const populatedAssignment = await Assignment.findById(
+    savedassignment._id
+  )
+    .populate("course", "title description thumbnail level")
+    .populate("teacher", "name email profileImage");
+
+  res.status(201).json({
+    success: true,
+    data: populatedAssignment,
+  });
+});
+
+// @desc    Update assignment
+// @route   PUT /api/assignments/:id
+// @access  Private/Teacher/Admin
+const updateAssignment = asyncHandler(async (req, res) => {
+  const assignment = await Assignment.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
     }
+  )
+    .populate("course", "title description thumbnail level")
+    .populate("teacher", "name email profileImage");
 
-    res.json({
-      success: true,
-      message: "assignment deleted successfully",
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid assignment ID format",
-      });
-    }
-    res.status(500).json({
+  if (!assignment) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to delete assignment",
+      error: "Assignment not found",
     });
   }
-};
+
+  res.json({
+    success: true,
+    data: assignment,
+  });
+});
+
+// @desc    Delete assignment
+// @route   DELETE /api/assignments/:id
+// @access  Private/Teacher/Admin
+const deleteAssignment = asyncHandler(async (req, res) => {
+  const assignment = await Assignment.findByIdAndDelete(req.params.id);
+
+  if (!assignment) {
+    return res.status(404).json({
+      success: false,
+      error: "Assignment not found",
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "Assignment deleted successfully",
+  });
+});
 
 export {
   getAllAssignments,

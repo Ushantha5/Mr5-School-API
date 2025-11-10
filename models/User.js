@@ -1,6 +1,6 @@
 // models/User.js
 import mongoose from "mongoose";
-// import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 6,
+      select: false, // Don't return password by default
     },
     role: {
       type: String,
@@ -39,11 +40,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Password hash middleware
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//   this.password = await bcrypt.hash(this.password, 10);
-//   next();
-// });
+// Password hash middleware (only if password is modified)
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
 export default mongoose.model("User", userSchema);

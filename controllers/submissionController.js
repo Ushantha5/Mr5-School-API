@@ -1,161 +1,152 @@
 import Submission from "../models/Submission.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
+import { paginate } from "../utils/pagination.js";
 
-const getAllSubmissions = async (req, res) => {
-  try {
-    const submissions = await Submission.find()
-      .populate("assignment", "title dueDate")
-      .populate("student", "name email");
+// @desc    Get all submissions with pagination
+// @route   GET /api/submissions
+// @access  Private
+const getAllSubmissions = asyncHandler(async (req, res) => {
+  const { page, limit, assignment, student, grade } = req.query;
 
-    res.status(200).json({
-      success: true,
-      count: submissions.length,
-      data: submissions,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching submissions",
-      error: error.message,
-    });
-  }
-};
+  // Build query
+  const query = {};
+  if (assignment) query.assignment = assignment;
+  if (student) query.student = student;
+  if (grade) query.grade = grade;
 
-// Change: getsubmissionById → getSubmissionById
-const getSubmissionById = async (req, res) => {
-  try {
-    const submission = await Submission.findById(req.params.id);
-
-    if (!submission) {
-      // Changed from !Submission to !submission
-      return res.status(404).json({
-        success: false,
-        error: "Submission not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: Submission,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid submission ID format",
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      error: "Failed to fetch submission",
-    });
-  }
-};
-
-// Change: createsubmission → createSubmission
-const createSubmission = async (req, res) => {
-  try {
-    const newsubmission = new Submission(req.body);
-    const savedsubmission = await newsubmission.save();
-
-    res.status(201).json({
-      success: true,
-      data: savedsubmission,
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      // Changed from error.title
-      const errors = Object.values(error.errors).map((err) => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return res.status(400).json({
-        success: false,
-        error: "Validation failed",
-        details: errors,
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to create submission",
-    });
-  }
-};
-
-// Change: updatesubmission → updateSubmission
-const updateSubmission = async (req, res) => {
-  try {
-    const submission = await Submission.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+  const result = await paginate(Submission, query, {
+    page,
+    limit,
+    sort: "-createdAt",
+    populate: [
       {
-        new: true,
-        runValidators: true,
-      }
-    );
+        path: "assignment",
+        select: "title description dueDate",
+        populate: {
+          path: "course",
+          select: "title",
+        },
+      },
+      {
+        path: "student",
+        select: "name email profileImage",
+      },
+    ],
+  });
 
-    if (!submission) {
-      // Changed from !Submission to !submission
-      return res.status(404).json({
-        success: false,
-        error: "submission not found",
-      });
-    }
+  res.status(200).json({
+    success: true,
+    ...result,
+  });
+});
 
-    res.json({
-      success: true,
-      data: submission,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid submission ID format",
-      });
-    }
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        errors,
-      });
-    }
-    res.status(500).json({
+// @desc    Get submission by ID
+// @route   GET /api/submissions/:id
+// @access  Private
+const getSubmissionById = asyncHandler(async (req, res) => {
+  const submission = await Submission.findById(req.params.id)
+    .populate({
+      path: "assignment",
+      select: "title description dueDate",
+      populate: {
+        path: "course",
+        select: "title",
+      },
+    })
+    .populate("student", "name email profileImage");
+
+  if (!submission) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to update submission",
+      error: "Submission not found",
     });
   }
-};
 
-// Change: deletesubmission → deleteSubmission
-const deleteSubmission = async (req, res) => {
-  try {
-    const submission = await Submission.findByIdAndDelete(req.params.id);
+  res.json({
+    success: true,
+    data: submission,
+  });
+});
 
-    if (!submission) {
-      return res.status(404).json({
-        success: false,
-        error: "submission not found",
-      });
+// @desc    Create submission
+// @route   POST /api/submissions
+// @access  Private
+const createSubmission = asyncHandler(async (req, res) => {
+  const newsubmission = new Submission(req.body);
+  const savedsubmission = await newsubmission.save();
+
+  const populatedSubmission = await Submission.findById(
+    savedsubmission._id
+  )
+    .populate({
+      path: "assignment",
+      select: "title description dueDate",
+      populate: {
+        path: "course",
+        select: "title",
+      },
+    })
+    .populate("student", "name email profileImage");
+
+  res.status(201).json({
+    success: true,
+    data: populatedSubmission,
+  });
+});
+
+// @desc    Update submission
+// @route   PUT /api/submissions/:id
+// @access  Private
+const updateSubmission = asyncHandler(async (req, res) => {
+  const submission = await Submission.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
     }
+  )
+    .populate({
+      path: "assignment",
+      select: "title description dueDate",
+      populate: {
+        path: "course",
+        select: "title",
+      },
+    })
+    .populate("student", "name email profileImage");
 
-    res.json({
-      success: true,
-      message: "submission deleted successfully",
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid submission ID format",
-      });
-    }
-    res.status(500).json({
+  if (!submission) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to delete submission",
+      error: "Submission not found",
     });
   }
-};
+
+  res.json({
+    success: true,
+    data: submission,
+  });
+});
+
+// @desc    Delete submission
+// @route   DELETE /api/submissions/:id
+// @access  Private
+const deleteSubmission = asyncHandler(async (req, res) => {
+  const submission = await Submission.findByIdAndDelete(req.params.id);
+
+  if (!submission) {
+    return res.status(404).json({
+      success: false,
+      error: "Submission not found",
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "Submission deleted successfully",
+  });
+});
 
 export {
   getAllSubmissions,

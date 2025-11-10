@@ -1,153 +1,123 @@
 import Course from "../models/Course.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
+import { paginate } from "../utils/pagination.js";
 
-const getAllCourses = async (req, res) => {
-  try {
-    const courses = await Course.find()
-      .populate("teacher", "name email")
-      .sort({ createdAt: -1 });
+// @desc    Get all courses with pagination
+// @route   GET /api/courses
+// @access  Public
+const getAllCourses = asyncHandler(async (req, res) => {
+  const { page, limit, teacher, level, language, search, isApproved } =
+    req.query;
 
-    res
-      .status(200)
-      .json({ success: true, count: courses.length, data: courses });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error fetching courses", error });
+  // Build query
+  const query = {};
+  if (teacher) query.teacher = teacher;
+  if (level) query.level = level;
+  if (language) query.language = language;
+  if (isApproved !== undefined) query.isApproved = isApproved === "true";
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
+    ];
   }
-};
 
-// Change: getcourseById → getCourseById
-const getCourseById = async (req, res) => {
-  try {
-    const cours = await Course.findById(req.params.id);
+  const result = await paginate(Course, query, {
+    page,
+    limit,
+    sort: "-createdAt",
+    populate: [
+      { path: "teacher", select: "name email profileImage" },
+    ],
+  });
 
-    if (!cours) {
-      // Changed from !Course to !cours
-      return res.status(404).json({
-        success: false,
-        error: "Course not found",
-      });
-    }
+  res.status(200).json({
+    success: true,
+    ...result,
+  });
+});
 
-    res.json({
-      success: true,
-      data: Course,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid course ID format",
-      });
-    }
+// @desc    Get course by ID
+// @route   GET /api/courses/:id
+// @access  Public
+const getCourseById = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id).populate(
+    "teacher",
+    "name email profileImage"
+  );
 
-    res.status(500).json({
+  if (!course) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to fetch course",
+      error: "Course not found",
     });
   }
-};
 
-// Change: createcourse → createCourse
-const createCourse = async (req, res) => {
-  try {
-    const newcourse = new Course(req.body);
-    const savedcourse = await newcourse.save();
+  res.json({
+    success: true,
+    data: course,
+  });
+});
 
-    res.status(201).json({
-      success: true,
-      data: savedcourse,
-    });
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      // Changed from error.title
-      const errors = Object.values(error.errors).map((err) => ({
-        field: err.path,
-        message: err.message,
-      }));
-      return res.status(400).json({
-        success: false,
-        error: "Validation failed",
-        details: errors,
-      });
-    }
-    res.status(500).json({
+// @desc    Create course
+// @route   POST /api/courses
+// @access  Private/Teacher/Admin
+const createCourse = asyncHandler(async (req, res) => {
+  const newcourse = new Course(req.body);
+  const savedcourse = await newcourse.save();
+
+  const populatedCourse = await Course.findById(savedcourse._id).populate(
+    "teacher",
+    "name email profileImage"
+  );
+
+  res.status(201).json({
+    success: true,
+    data: populatedCourse,
+  });
+});
+
+// @desc    Update course
+// @route   PUT /api/courses/:id
+// @access  Private/Teacher/Admin
+const updateCourse = asyncHandler(async (req, res) => {
+  const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  }).populate("teacher", "name email profileImage");
+
+  if (!course) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to create course",
+      error: "Course not found",
     });
   }
-};
 
-// Change: updatecourse → updateCourse
-const updateCourse = async (req, res) => {
-  try {
-    const cours = await Course.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+  res.json({
+    success: true,
+    data: course,
+  });
+});
 
-    if (!cours) {
-      // Changed from !Course to !cours
-      return res.status(404).json({
-        success: false,
-        error: "course not found",
-      });
-    }
+// @desc    Delete course
+// @route   DELETE /api/courses/:id
+// @access  Private/Admin
+const deleteCourse = asyncHandler(async (req, res) => {
+  const course = await Course.findByIdAndDelete(req.params.id);
 
-    res.json({
-      success: true,
-      data: cours,
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid course ID format",
-      });
-    }
-    if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
-        success: false,
-        errors,
-      });
-    }
-    res.status(500).json({
+  if (!course) {
+    return res.status(404).json({
       success: false,
-      error: "Failed to update course",
+      error: "Course not found",
     });
   }
-};
 
-// Change: deletecourse → deleteCourse
-const deleteCourse = async (req, res) => {
-  try {
-    const cours = await Course.findByIdAndDelete(req.params.id);
-
-    if (!cours) {
-      return res.status(404).json({
-        success: false,
-        error: "course not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "course deleted successfully",
-    });
-  } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid course ID format",
-      });
-    }
-    res.status(500).json({
-      success: false,
-      error: "Failed to delete course",
-    });
-  }
-};
+  res.json({
+    success: true,
+    message: "Course deleted successfully",
+  });
+});
 
 export {
   getAllCourses,
