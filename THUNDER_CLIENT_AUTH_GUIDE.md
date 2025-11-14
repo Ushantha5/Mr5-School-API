@@ -2,7 +2,7 @@
 
 This guide will help you test the authentication API endpoints using Thunder Client (or any REST client like Postman).
 
-## 📋 Table of Contents
+##  Table of Contents
 - [Prerequisites](#prerequisites)
 - [Base URL](#base-url)
 - [Authentication Flow](#authentication-flow)
@@ -593,7 +593,7 @@ If you encounter any issues:
 
 ---
 
-**Happy Testing! 🚀**
+**Happy Testing! **
 
 
 

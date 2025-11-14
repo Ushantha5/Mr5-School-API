@@ -6,13 +6,19 @@ import { paginate } from "../utils/pagination.js";
 // @route   GET /api/submissions
 // @access  Private
 const getAllSubmissions = asyncHandler(async (req, res) => {
-  const { page, limit, assignment, student, grade } = req.query;
+  const { page, limit, assignment, student, grade, search } = req.query;
 
   // Build query
   const query = {};
   if (assignment) query.assignment = assignment;
   if (student) query.student = student;
   if (grade) query.grade = grade;
+  if (search) {
+    query.$or = [
+      { feedback: { $regex: search, $options: "i" } },
+      { fileUrl: { $regex: search, $options: "i" } },
+    ];
+  }
 
   const result = await paginate(Submission, query, {
     page,

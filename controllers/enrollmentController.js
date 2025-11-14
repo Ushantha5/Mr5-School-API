@@ -6,13 +6,15 @@ import { paginate } from "../utils/pagination.js";
 // @route   GET /api/enrollments
 // @access  Private
 const getAllEnrollments = asyncHandler(async (req, res) => {
-  const { page, limit, student, course, status } = req.query;
+  const { page, limit, student, course, status, search } = req.query;
 
   // Build query
   const query = {};
   if (student) query.student = student;
   if (course) query.course = course;
   if (status) query.status = status;
+  // Note: Search is handled through populated fields on frontend
+  // or we can enhance with aggregation pipeline for better search
 
   const result = await paginate(Enrollment, query, {
     page,

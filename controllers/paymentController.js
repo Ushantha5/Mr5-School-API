@@ -6,7 +6,7 @@ import { paginate } from "../utils/pagination.js";
 // @route   GET /api/payments
 // @access  Private/Admin
 const getAllPayments = asyncHandler(async (req, res) => {
-  const { page, limit, user, course, status, method } = req.query;
+  const { page, limit, user, course, status, method, search } = req.query;
 
   // Build query
   const query = {};
@@ -14,6 +14,11 @@ const getAllPayments = asyncHandler(async (req, res) => {
   if (course) query.course = course;
   if (status) query.status = status;
   if (method) query.method = method;
+  if (search) {
+    query.$or = [
+      { transactionId: { $regex: search, $options: "i" } },
+    ];
+  }
 
   const result = await paginate(Payment, query, {
     page,

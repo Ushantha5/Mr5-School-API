@@ -6,11 +6,11 @@ MR.G Platform - AI-Powered Educational Platform
 
 ```
 
-## Overview 📋
+## Overview 
 
 `MR.G` (Master's Reach & Guidance) is an AI-powered educational platform that bridges deep human expertise with scalable AI delivery. Domain experts contribute their tacit knowledge through intuitive interfaces, while AI creates personalized, interactive learning experiences at scale.This means that you will have a great leadership for learning and earning.
 
-## Key Features 🎯
+## Key Features 
 
 - **Expert Knowledge Capture**: Video, Q&A, and simulation interfaces for experts
 - **AI-Powered Learning**: Personalized modules generated from expert knowledge
