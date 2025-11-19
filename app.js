@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-// import morgan from "morgan";
 import connectDB from "./config/db.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -27,7 +26,6 @@ connectDB();
 
 const app = express();
 app.use(cors());
-// app.use(morgan("dev"));
 app.use(express.json());
 
 // Routes
