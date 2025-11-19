@@ -52,27 +52,27 @@ const coursesData = [
  */
 async function seedCourses() {
   try {
-    console.log("🌱 Starting course seeding process...\n");
+    console.log(" Starting course seeding process...\n");
 
     // Connect to database
     await connectDB();
-    console.log("✅ Connected to database\n");
+    console.log(" Connected to database\n");
 
     // Find or create a default admin/teacher user
     let teacher = await User.findOne({ role: { $in: ["teacher", "admin"] } });
     
     if (!teacher) {
-      console.log("⚠️  No teacher/admin user found. Creating default teacher...");
+      console.log("  No teacher/admin user found. Creating default teacher...");
       teacher = await User.create({
         name: "Course Administrator",
         email: "admin@courses.com",
         password: "Admin@123",
         role: "admin",
         isActive: true,
-      });
-      console.log("✅ Created default teacher/admin user\n");
+      })
+      console.log(" Created default teacher/admin user\n");
     } else {
-      console.log(`✅ Using existing teacher: ${teacher.name}\n`);
+      console.log(` Using existing teacher: ${teacher.name}\n`);
     }
 
     // Process each course
@@ -94,7 +94,7 @@ async function seedCourses() {
         let existingCourse = await Course.findOne({ title: courseInfo.title });
 
         // Generate course details using Gemini API
-        console.log(`   📝 Generating course details...`);
+        console.log(`    Generating course details...`);
         const courseDetails = await generateCourseDetails(courseInfo.title);
         
         // Prepare course data
@@ -114,22 +114,22 @@ async function seedCourses() {
           Object.assign(existingCourse, courseData);
           await existingCourse.save();
           results.updated++;
-          console.log(`   ✅ Updated existing course`);
+          console.log(`    Updated existing course`);
         } else {
           // Create new course
           await Course.create(courseData);
           results.created++;
-          console.log(`   ✅ Created new course`);
+          console.log(`    Created new course`);
         }
 
-        console.log(`   💰 Price: Rs${courseInfo.price.toLocaleString()}`);
-        console.log(`   📂 Category: ${courseDetails.category}`);
-        console.log(`   📊 Level: ${courseDetails.level}\n`);
+        console.log(`    Price: Rs${courseInfo.price.toLocaleString()}`);
+        console.log(`    Category: ${courseDetails.category}`);
+        console.log(`    Level: ${courseDetails.level}\n`);
 
         // Small delay to avoid rate limiting
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (error) {
-        console.error(`   ❌ Error processing "${courseInfo.title}":`, error.message);
+        console.error(`    Error processing "${courseInfo.title}":`, error.message);
         results.errors.push({ course: courseInfo.title, error: error.message });
         results.skipped++;
       }
@@ -137,23 +137,23 @@ async function seedCourses() {
 
     // Print summary
     console.log("\n" + "=".repeat(60));
-    console.log("📊 SEEDING SUMMARY");
+    console.log(" SEEDING SUMMARY");
     console.log("=".repeat(60));
-    console.log(`✅ Created: ${results.created} courses`);
-    console.log(`🔄 Updated: ${results.updated} courses`);
-    console.log(`⏭️  Skipped: ${results.skipped} courses`);
+    console.log(` Created: ${results.created} courses`);
+    console.log(` Updated: ${results.updated} courses`);
+    console.log(`  Skipped: ${results.skipped} courses`);
     
     if (results.errors.length > 0) {
-      console.log(`\n❌ Errors encountered:`);
+      console.log(`\n Errors encountered:`);
       results.errors.forEach((err) => {
         console.log(`   - ${err.course}: ${err.error}`);
       });
     }
 
-    console.log("\n🎉 Course seeding completed!");
+    console.log("\n Course seeding completed!");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Fatal error during seeding:", error);
+    console.error(" Fatal error during seeding:", error);
     process.exit(1);
   }
 }
