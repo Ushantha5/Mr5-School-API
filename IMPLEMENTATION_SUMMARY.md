@@ -1,6 +1,6 @@
 # Implementation Summary
 
-## ✅ Completed Features
+## Completed Features
 
 ### 1. Authentication System
 - **JWT-based authentication** with secure password hashing (bcrypt)
@@ -72,19 +72,19 @@ JWT_EXPIRE=30d
 NODE_ENV=development
 ```
 
-## 📦 New Dependencies Installed
+##  New Dependencies Installed
 
 - `jsonwebtoken` - JWT token generation and verification
 - `bcryptjs` - Password hashing
 
-## 🐛 Bugs Fixed
+##  Bugs Fixed
 
 1. Fixed controllers returning Model instead of document (e.g., `data: User` → `data: user`)
 2. Fixed missing import in assignmentController
 3. Fixed password double-hashing issue
 4. All controllers now use asyncHandler for proper error handling
 
-## 📝 Usage Examples
+##  Usage Examples
 
 ### Authentication
 ```javascript
@@ -117,7 +117,7 @@ router.get("/admin-only", verifyToken, authorize("admin"), controllerFunction);
 router.post("/teacher-or-admin", verifyToken, authorize("teacher", "admin"), controllerFunction);
 ```
 
-## 🚀 Next Steps
+##  Next Steps
 
 1. Install dependencies: `npm install` (already done)
 2. Set up `.env` file with your MongoDB URI and JWT secret
