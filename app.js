@@ -37,7 +37,7 @@ app.use("/api/lessons", lessonRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/assignments", assignmentRoutes);
-app.use("/api/aI_Assistant_Interctions", aI_Assistant_InterctionRoutes);
+app.use("/api/aI_Assistant_Interaction", aI_Assistant_InterctionRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

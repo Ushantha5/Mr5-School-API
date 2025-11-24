@@ -27,6 +27,17 @@ const userSchema = new mongoose.Schema(
       default: "student",
     },
     profileImage: String,
+    avatarUrl: {
+      type: String,
+      default: "", // URL to the GLB file from ReadyPlayer.me
+    },
+    emotions: [
+      {
+        emotion: String,
+        confidence: Number,
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
     language: {
       type: String,
       enum: ["English", "Tamil", "Sinhala"],
