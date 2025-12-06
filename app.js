@@ -28,10 +28,28 @@ const __dirname = dirname(__filename);
 // Load environment variables from .env file in the Server directory
 dotenv.config({ path: join(__dirname, ".env") });
 
-connectDB();
-
 const app = express();
-app.use(cors({ origin: "http://localhost:3000", credentials: true })); // Update CORS for cookies
+
+// Configure CORS - allow multiple origins for development and production
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://mr5-school-api.vercel.app",
+    process.env.CLIENT_URL
+].filter(Boolean);
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Allow all origins for public API
+        }
+    },
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -53,5 +71,22 @@ app.use("/api/tts", ttsRoutes);
 // Error handler (must be last)
 app.use(errorHandler);
 
+// Start server with database connection
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+
+// Async function to start the server
+(async () => {
+    try {
+        // Connect to database before starting server
+        await connectDB();
+
+        // Start the server only after DB is connected
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        });
+    } catch (error) {
+        console.error("Failed to start server:", error);
+        process.exit(1);
+    }
+})();
