@@ -16,25 +16,28 @@ const seedAdmin = async () => {
         console.log("✅ MongoDB Connected");
 
         // Check if admin already exists
-        const existingAdmin = await User.findOne({ email: "admin@mr5school.com" });
-        if (existingAdmin) {
-            console.log("⚠️  Admin user already exists");
-            process.exit(0);
+        let admin = await User.findOne({ email: "admin@mr5school.com" });
+
+        if (admin) {
+            console.log("⚠️  Admin user already exists. Updating password...");
+            admin.password = "Admin@123456";
+            await admin.save();
+            console.log("✅ Admin password updated.");
+        } else {
+            // Create admin user
+            admin = await User.create({
+                name: "Admin User",
+                email: "admin@mr5school.com",
+                password: "Admin@123456", // Will be hashed by pre-save hook
+                role: "admin",
+                status: "approved",
+                isActive: true,
+            });
+            console.log("✅ Admin user created successfully!");
         }
 
-        // Create admin user
-        const admin = await User.create({
-            name: "Admin User",
-            email: "admin@mr5school.com",
-            password: "admin123", // Will be hashed by pre-save hook
-            role: "admin",
-            status: "approved",
-            isActive: true,
-        });
-
-        console.log("✅ Admin user created successfully!");
         console.log("📧 Email: admin@mr5school.com");
-        console.log("🔑 Password: admin123");
+        console.log("🔑 Password: Admin@123456");
         console.log("\n⚠️  Please change the password after first login!");
 
         process.exit(0);
