@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  getAllSubmissions,
-  getSubmissionById,
-  createSubmission,
-  updateSubmission,
-  deleteSubmission,
+	getAllSubmissions,
+	getSubmissionById,
+	createSubmission,
+	updateSubmission,
+	deleteSubmission,
 } from "../controllers/submissionController.js";
 const router = express.Router();
 router.get("/", getAllSubmissions);

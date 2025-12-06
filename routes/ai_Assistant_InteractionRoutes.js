@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  getAllAi_Assistant_Interctions,
-  getAi_Assistant_InterctionById,
-  createAi_Assistant_Interction,
-  updateAi_Assistant_Interction,
-  deleteAi_Assistant_Interction,
+	getAllAi_Assistant_Interctions,
+	getAi_Assistant_InterctionById,
+	createAi_Assistant_Interction,
+	updateAi_Assistant_Interction,
+	deleteAi_Assistant_Interction,
 } from "../controllers/ai_Assistant_InteractionController.js";
 const router = express.Router();
 router.get("/", getAllAi_Assistant_Interctions);

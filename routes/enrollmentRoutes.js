@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  getAllEnrollments,
-  getEnrollmentById,
-  createEnrollment,
-  updateEnrollment,
-  deleteEnrollment,
+	getAllEnrollments,
+	getEnrollmentById,
+	createEnrollment,
+	updateEnrollment,
+	deleteEnrollment,
 } from "../controllers/enrollmentController.js";
 const router = express.Router();
 router.get("/", getAllEnrollments);

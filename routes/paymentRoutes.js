@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  getAllPayments,
-  getPaymentById,
-  createPayment,
-  updatePayment,
-  deletePayment,
+	getAllPayments,
+	getPaymentById,
+	createPayment,
+	updatePayment,
+	deletePayment,
 } from "../controllers/paymentController.js";
 
 const router = express.Router();

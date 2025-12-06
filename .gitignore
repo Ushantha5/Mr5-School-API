@@ -4,3 +4,4 @@ node_modules
 
 // HIDE SENSITIVE INFORMATION
 .env  
+node_modules

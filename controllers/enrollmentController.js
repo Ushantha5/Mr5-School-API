@@ -6,139 +6,137 @@ import { paginate } from "../utils/pagination.js";
 // @route   GET /api/enrollments
 // @access  Private
 const getAllEnrollments = asyncHandler(async (req, res) => {
-  const { page, limit, student, course, status, search } = req.query;
+	const { page, limit, student, course, status, search } = req.query;
 
-  // Build query
-  const query = {};
-  if (student) query.student = student;
-  if (course) query.course = course;
-  if (status) query.status = status;
-  // Note: Search is handled through populated fields on frontend
-  // or we can enhance with aggregation pipeline for better search
+	// Build query
+	const query = {};
+	if (student) query.student = student;
+	if (course) query.course = course;
+	if (status) query.status = status;
+	// Note: Search is handled through populated fields on frontend
+	// or we can enhance with aggregation pipeline for better search
 
-  const result = await paginate(Enrollment, query, {
-    page,
-    limit,
-    sort: "-createdAt",
-    populate: [
-      { path: "student", select: "name email profileImage" },
-      {
-        path: "course",
-        select: "title description thumbnail price level teacher",
-        populate: { path: "teacher", select: "name email" },
-      },
-    ],
-  });
+	const result = await paginate(Enrollment, query, {
+		page,
+		limit,
+		sort: "-createdAt",
+		populate: [
+			{ path: "student", select: "name email profileImage" },
+			{
+				path: "course",
+				select: "title description thumbnail price level teacher",
+				populate: { path: "teacher", select: "name email" },
+			},
+		],
+	});
 
-  res.status(200).json({
-    success: true,
-    ...result,
-  });
+	res.status(200).json({
+		success: true,
+		...result,
+	});
 });
 
 // @desc    Get enrollment by ID
 // @route   GET /api/enrollments/:id
 // @access  Private
 const getEnrollmentById = asyncHandler(async (req, res) => {
-  const enrollment = await Enrollment.findById(req.params.id)
-    .populate("student", "name email profileImage")
-    .populate({
-      path: "course",
-      select: "title description thumbnail price level teacher",
-      populate: { path: "teacher", select: "name email" },
-    });
+	const enrollment = await Enrollment.findById(req.params.id)
+		.populate("student", "name email profileImage")
+		.populate({
+			path: "course",
+			select: "title description thumbnail price level teacher",
+			populate: { path: "teacher", select: "name email" },
+		});
 
-  if (!enrollment) {
-    return res.status(404).json({
-      success: false,
-      error: "Enrollment not found",
-    });
-  }
+	if (!enrollment) {
+		return res.status(404).json({
+			success: false,
+			error: "Enrollment not found",
+		});
+	}
 
-  res.json({
-    success: true,
-    data: enrollment,
-  });
+	res.json({
+		success: true,
+		data: enrollment,
+	});
 });
 
 // @desc    Create enrollment
 // @route   POST /api/enrollments
 // @access  Private
 const createEnrollment = asyncHandler(async (req, res) => {
-  const newenrollment = new Enrollment(req.body);
-  const savedenrollment = await newenrollment.save();
+	const newenrollment = new Enrollment(req.body);
+	const savedenrollment = await newenrollment.save();
 
-  const populatedEnrollment = await Enrollment.findById(
-    savedenrollment._id
-  )
-    .populate("student", "name email profileImage")
-    .populate({
-      path: "course",
-      select: "title description thumbnail price level teacher",
-      populate: { path: "teacher", select: "name email" },
-    });
+	const populatedEnrollment = await Enrollment.findById(savedenrollment._id)
+		.populate("student", "name email profileImage")
+		.populate({
+			path: "course",
+			select: "title description thumbnail price level teacher",
+			populate: { path: "teacher", select: "name email" },
+		});
 
-  res.status(201).json({
-    success: true,
-    data: populatedEnrollment,
-  });
+	res.status(201).json({
+		success: true,
+		data: populatedEnrollment,
+	});
 });
 
 // @desc    Update enrollment
 // @route   PUT /api/enrollments/:id
 // @access  Private
 const updateEnrollment = asyncHandler(async (req, res) => {
-  const enrollment = await Enrollment.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-      runValidators: true,
-    }
-  )
-    .populate("student", "name email profileImage")
-    .populate({
-      path: "course",
-      select: "title description thumbnail price level teacher",
-      populate: { path: "teacher", select: "name email" },
-    });
+	const enrollment = await Enrollment.findByIdAndUpdate(
+		req.params.id,
+		req.body,
+		{
+			new: true,
+			runValidators: true,
+		},
+	)
+		.populate("student", "name email profileImage")
+		.populate({
+			path: "course",
+			select: "title description thumbnail price level teacher",
+			populate: { path: "teacher", select: "name email" },
+		});
 
-  if (!enrollment) {
-    return res.status(404).json({
-      success: false,
-      error: "Enrollment not found",
-    });
-  }
+	if (!enrollment) {
+		return res.status(404).json({
+			success: false,
+			error: "Enrollment not found",
+		});
+	}
 
-  res.json({
-    success: true,
-    data: enrollment,
-  });
+	res.json({
+		success: true,
+		data: enrollment,
+	});
 });
 
 // @desc    Delete enrollment
 // @route   DELETE /api/enrollments/:id
 // @access  Private
 const deleteEnrollment = asyncHandler(async (req, res) => {
-  const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
+	const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
 
-  if (!enrollment) {
-    return res.status(404).json({
-      success: false,
-      error: "Enrollment not found",
-    });
-  }
+	if (!enrollment) {
+		return res.status(404).json({
+			success: false,
+			error: "Enrollment not found",
+		});
+	}
 
-  res.json({
-    success: true,
-    message: "Enrollment deleted successfully",
-  });
+	res.json({
+		success: true,
+		message: "Enrollment deleted successfully",
+	});
 });
 
 export {
-  getAllEnrollments,
-  getEnrollmentById,
-  createEnrollment,
-  updateEnrollment,
-  deleteEnrollment,
+	getAllEnrollments,
+	getEnrollmentById,
+	createEnrollment,
+	updateEnrollment,
+	deleteEnrollment,
 };

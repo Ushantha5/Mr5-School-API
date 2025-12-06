@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  getAllLessons,
-  getLessonById,
-  createLesson,
-  updateLesson,
-  deleteLesson,
+	getAllLessons,
+	getLessonById,
+	createLesson,
+	updateLesson,
+	deleteLesson,
 } from "../controllers/lessonController.js";
 const router = express.Router();
 router.get("/", getAllLessons);
