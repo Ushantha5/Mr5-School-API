@@ -20,6 +20,7 @@ import avathorRoutes from "./routes/avathorRoutes.js";
 import livekitRoutes from "./routes/livekitRoutes.js";
 import ttsRoutes from "./routes/ttsRoutes.js";
 import course from "./routes/courseRoutes.js"
+import { success } from "zod";
 
 // Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -70,6 +71,13 @@ app.use("/api/tts", ttsRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
+
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "Welcome to MR5"
+    });
+})
 
 // Start server with database connection
 const PORT = process.env.PORT || 5000;
